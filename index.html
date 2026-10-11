@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f9f9ff">
+  <title>Split</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <!-- Events screen -->
+    <section id="events-view" class="events-view">
+      <header class="page-header">
+        <h1>Split</h1>
+        <p class="subtitle">Split expenses, settle up.</p>
+      </header>
+
+      <form id="event-form" class="card inline-form" novalidate>
+        <label class="field">
+          <span class="field-label">New event</span>
+          <input id="event-name" type="text" placeholder="e.g. Goa Trip" maxlength="60" autocomplete="off">
+        </label>
+        <button class="btn btn-filled" type="submit">Add event</button>
+        <p id="event-error" class="error" role="alert"></p>
+      </form>
+
+      <h2 class="section-title">Your events</h2>
+      <div id="event-list" class="event-list"></div>
+    </section>
+
+    <!-- Event details screen -->
+    <section id="detail-view" hidden>
+      <header class="app-bar">
+        <button id="back-btn" class="icon-btn" type="button" aria-label="Back to events">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div class="app-bar-text">
+          <h1 id="detail-name"></h1>
+          <p id="detail-meta" class="subtitle"></p>
+        </div>
+        <button id="share-btn" class="btn btn-tonal btn-small" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+          <span id="share-label">Share</span>
+        </button>
+      </header>
+
+      <div class="detail-grid">
+        <section id="participants-card" class="card">
+          <h2>Participants</h2>
+          <form id="participant-form" class="inline-form" novalidate>
+            <label class="field">
+              <span class="field-label">Add participant</span>
+              <input id="participant-name" type="text" placeholder="Name" maxlength="40" autocomplete="off">
+            </label>
+            <button class="btn btn-tonal" type="submit">Add</button>
+            <p id="participant-error" class="error" role="alert"></p>
+          </form>
+          <ul id="participant-list" class="chips"></ul>
+        </section>
+
+        <section id="expenses-card" class="card">
+          <div class="card-header">
+            <h2>Expenses</h2>
+            <button id="add-expense-btn" class="btn btn-filled fab" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Add expense
+            </button>
+          </div>
+          <div id="expense-list"></div>
+        </section>
+
+        <section id="settle-card" class="card">
+          <div class="card-header">
+            <h2>Settle up</h2>
+            <button id="copy-summary-btn" class="btn btn-tonal btn-small" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              <span id="copy-summary-label">Copy summary</span>
+            </button>
+          </div>
+          <div id="settlement"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add / edit expense -->
+  <dialog id="expense-dialog" aria-labelledby="dialog-title">
+    <form id="expense-form" class="dialog-form" novalidate>
+      <div class="dialog-header">
+        <h2 id="dialog-title">Add expense</h2>
+        <button id="dialog-close" class="icon-btn" type="button" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Description</span>
+        <input id="expense-description" type="text" placeholder="e.g. Dinner" maxlength="60" autocomplete="off">
+        <span id="description-error" class="error"></span>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Amount</span>
+          <span class="amount-input">
+            <span class="amount-prefix" aria-hidden="true">₹</span>
+            <input id="expense-amount" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+          </span>
+          <span id="amount-error" class="error"></span>
+        </label>
+        <label class="field">
+          <span class="field-label">Paid by</span>
+          <select id="expense-payer"></select>
+        </label>
+      </div>
+
+      <div class="field" role="group" aria-labelledby="split-label">
+        <div class="split-header">
+          <span id="split-label" class="field-label">Split among</span>
+          <button id="toggle-all" class="btn btn-text btn-small" type="button">Clear all</button>
+        </div>
+        <div id="split-options" class="split-options"></div>
+        <div class="split-summary">
+          <span id="split-count"></span>
+          <span id="share-preview" class="share-preview" aria-live="polite"></span>
+        </div>
+        <span id="split-error" class="error"></span>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="btn btn-text" type="button">Cancel</button>
+        <button class="btn btn-filled" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
