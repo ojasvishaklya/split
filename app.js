@@ -629,7 +629,10 @@ function init() {
       saveState();
     }
     const url = `${location.href.split('#')[0]}#e=${await encodeShareData(eventToSharePayload(event))}`;
-    if (navigator.share) {
+    // Share sheet only on touch devices over http(s); desktop Chrome can crash the tab on navigator.share
+    const useShareSheet = navigator.share && /^https?:$/.test(location.protocol)
+      && matchMedia('(pointer: coarse)').matches;
+    if (useShareSheet) {
       try {
         await navigator.share({ title: `${event.name} · Split`, url });
         return;
