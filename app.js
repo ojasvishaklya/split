@@ -617,18 +617,24 @@ function init() {
 
   $('add-expense-btn').addEventListener('click', () => openExpenseDialog(null));
 
+  async function buildShareUrl(event) {
+    if (!event.shareId) {
+      event.shareId = randomShareId(); // events saved before sharing existed
+      saveState();
+    }
+    return `${location.href.split('#')[0]}#e=${await encodeShareData(eventToSharePayload(event))}`;
+  }
+
   $('copy-summary-btn').addEventListener('click', async () => {
-    const copied = await copyToClipboard(buildShareText(getCurrentEvent()));
+    const event = getCurrentEvent();
+    const text = `${buildShareText(event)}\n\nView & edit: ${await buildShareUrl(event)}`;
+    const copied = await copyToClipboard(text);
     flashLabel('copy-summary-label', copied ? 'Copied!' : 'Copy failed', 'Copy summary');
   });
 
   $('share-btn').addEventListener('click', async () => {
     const event = getCurrentEvent();
-    if (!event.shareId) {
-      event.shareId = randomShareId(); // events saved before sharing existed
-      saveState();
-    }
-    const url = `${location.href.split('#')[0]}#e=${await encodeShareData(eventToSharePayload(event))}`;
+    const url = await buildShareUrl(event);
     // Share sheet only on touch devices over http(s); desktop Chrome can crash the tab on navigator.share
     const useShareSheet = navigator.share && /^https?:$/.test(location.protocol)
       && matchMedia('(pointer: coarse)').matches;
